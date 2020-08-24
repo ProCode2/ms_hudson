@@ -1,6 +1,7 @@
-use clap::{App, Arg, SubCommand};
+use clap::{App, Arg};
 use std::fs;
-use std::path::Path;
+mod web_dev;
+use web_dev::{ create_web_dev_folder };
 
 fn main() -> std::io::Result<()> {
     let matches = App::new("Ms.Hudson")
@@ -23,19 +24,18 @@ fn main() -> std::io::Result<()> {
                 .takes_value(false),
         )
         .get_matches();
-    let value = matches.value_of("New_Project").unwrap_or("newproject");
-    match fs::create_dir(value) {
+    let filename = matches.value_of("New_Project").unwrap_or("newproject");
+    match fs::create_dir(filename) {
         Ok(_) => {
             if matches.is_present("Webdev project") {
-                fs::File::create(format!("{}/index.html", value))?;
-                fs::File::create(format!("{}/style.css", value))?;
-                fs::File::create(format!("{}/index.js", value))?;
+                //making a general web dev file structure
+                create_web_dev_folder(&filename);
             }
         }
         Err(err) => {
-            println!("{}", err);
+            return Err(err);
         }
     }
-    println!("{}", value);
+    println!("{}", filename);
     Ok(())
 }
