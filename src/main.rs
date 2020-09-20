@@ -1,10 +1,10 @@
 use clap::{App, Arg};
 use std::fs;
-mod web_dev;
 mod git;
-use git::{ make_github_repo };
-use web_dev::{ create_web_dev_folder };
-
+mod web_dev;
+use git::make_github_repo;
+use web_dev::create_web_dev_folder;
+use std::io::{Error, ErrorKind};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -18,39 +18,50 @@ async fn main() -> std::io::Result<()> {
                 .long("newproject")
                 .value_name("filename")
                 .help("creates a project folder for you")
-                .takes_value(true)
+                .takes_value(true),
         )
         .arg(
             Arg::with_name("Webdev project")
                 .short("w")
                 .long("webdev")
                 .help("creates html, css, js files within project")
-                .takes_value(false)
+                .takes_value(false),
         )
         .arg(
             Arg::with_name("github project")
-            .short("g")
-            .long("git")
-            .help("creates a github repository(requires token)")
-            .takes_value(false)
+                .short("g")
+                .long("git")
+                .help("creates a github repository(requires token)")
+                .takes_value(false),
         )
         .get_matches();
     let filename = matches.value_of("New_Project").unwrap_or("newproject");
-    match fs::create_dir(filename) {
-        Ok(_) => {
-            if matches.is_present("Webdev project") {
-                //making a general web dev file structure
-                create_web_dev_folder(&filename);
-            }
-        }
-        Err(err) => {
-            return Err(err);
-        }
-    }
 
     if matches.is_present("github project") {
         //create a github repository
-        make_github_repo(&filename).await;
+        match make_github_repo(&filename).await {
+            Ok(_) => {
+                if matches.is_present("Webdev project") {
+                    //making a general web dev file structure
+                    create_web_dev_folder(&filename);
+                }
+            }
+            Err(err) => {
+                return Err(Error::new(ErrorKind::Other, "Could Not Create File"));
+            }
+        }
+    } else {
+        match fs::create_dir(filename) {
+            Ok(_) => {
+                if matches.is_present("Webdev project") {
+                    //making a general web dev file structure
+                    create_web_dev_folder(&filename);
+                }
+            }
+            Err(err) => {
+                return Err(Error::new(ErrorKind::Other, "Could Not Create File"));
+            }
+        }
     }
     println!("{}", filename);
     Ok(())

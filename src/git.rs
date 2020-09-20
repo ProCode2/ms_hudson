@@ -30,7 +30,7 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
     */
     let cd_output = Command::new("git")
         .arg("init")
-        .arg("newproject")
+        .arg(&filename)
         .output()
         .expect("Could not process cd command");
 
@@ -38,6 +38,6 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
         Ok(y) => y,
         Err(e) => e.to_string()
     };
-    println!("{}", output);
+    println!("{} Type the following commands to get started!\ncd newproject\ngit remote add origin", output);
     Ok(())
 }
