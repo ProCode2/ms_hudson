@@ -43,10 +43,17 @@ async fn main() -> std::io::Result<()> {
             Ok(_) => {
                 if matches.is_present("Webdev project") {
                     //making a general web dev file structure
-                    create_web_dev_folder(&filename);
+                    match create_web_dev_folder(&filename) {
+                        Ok(_) => {
+                            println!("Created Web Dev directory");
+                        },
+                        Err(_) => {
+                            println!("Could not create a web dev directory");
+                        }
+                    }
                 }
             }
-            Err(err) => {
+            Err(_) => {
                 return Err(Error::new(ErrorKind::Other, "Could Not Create File"));
             }
         }
@@ -55,10 +62,13 @@ async fn main() -> std::io::Result<()> {
             Ok(_) => {
                 if matches.is_present("Webdev project") {
                     //making a general web dev file structure
-                    create_web_dev_folder(&filename);
+                    match create_web_dev_folder(&filename) {
+                        Ok(_) => println!("Created a web dev directory"),
+                        Err(_) => println!("Could not create a web dev directory")
+                    }
                 }
             }
-            Err(err) => {
+            Err(_) => {
                 return Err(Error::new(ErrorKind::Other, "Could Not Create File"));
             }
         }
