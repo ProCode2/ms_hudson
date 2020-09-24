@@ -2,7 +2,7 @@ use clap::{App, Arg};
 use std::fs;
 mod git;
 mod web_dev;
-use git::make_github_repo;
+use git::{ make_github_repo, addCommitPush };
 use web_dev::create_web_dev_folder;
 use std::io::{Error, ErrorKind};
 
@@ -33,6 +33,27 @@ async fn main() -> std::io::Result<()> {
                 .long("git")
                 .help("creates a github repository(requires token)")
                 .takes_value(false),
+        )
+        .arg(
+            Arg::with_name("gacp")
+            .short("p")
+            .long("push")
+            .help("Stage/add files to commit, commit and push to given branch")
+            .takes_value(false),
+        )
+        .arg(
+            Arg::with_name("git_branch")
+            .short("b")
+            .long("branch")
+            .help("Commits and push changes to given branch")
+            .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("git_commit")
+            .short("m")
+            .long("message")
+            .help("The commit message")
+            .takes_value(true),
         )
         .get_matches();
     let filename = matches.value_of("New_Project").unwrap_or("newproject");
@@ -72,6 +93,13 @@ async fn main() -> std::io::Result<()> {
                 return Err(Error::new(ErrorKind::Other, "Could Not Create File"));
             }
         }
+    }
+
+    if matches.is_present("gacp") {
+        let branch = matches.value_of("git_branch").unwrap_or("master");
+        let message = matches.value_of("git_commit").unwrap_or("Initial Commit");
+
+        addCommitPush(&branch, &message);
     }
     println!("{}", filename);
     Ok(())

@@ -1,5 +1,5 @@
-use reqwest::header::{ USER_AGENT };
 use dotenv::dotenv;
+use reqwest::header::USER_AGENT;
 use reqwest::Client;
 use reqwest::Error;
 use std::collections::HashMap;
@@ -36,8 +36,30 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
 
     let output = match String::from_utf8(cd_output.stdout) {
         Ok(y) => y,
-        Err(e) => e.to_string()
+        Err(e) => e.to_string(),
     };
-    println!("{} Type the following commands to get started!\ncd newproject\ngit remote add origin", output);
+    println!(
+        "\n{} Type the following commands to get started!\ncd newproject\ngit remote add origin",
+        output
+    );
+    Ok(())
+}
+
+pub fn addCommitPush(branch: &str, commit_message: &str) -> Result<(), ()> {
+    let git_push = Command::new("git")
+        .arg("commit")
+        .arg("-a")
+        .arg(format!("-m{}", &commit_message))
+        .output()
+        .expect("Could not push changes");
+
+    let output = match String::from_utf8(git_push.stdout) {
+        Ok(y) => y,
+        Err(e) => e.to_string(),
+    };
+    println!(
+        "\n{} Type the following commands to get started!\ncd newproject\ngit remote add origin",
+        output
+    );
     Ok(())
 }
