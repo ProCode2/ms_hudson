@@ -46,20 +46,39 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
 }
 
 pub fn addCommitPush(branch: &str, commit_message: &str) -> Result<(), ()> {
-    let git_push = Command::new("git")
+    let git_commit = Command::new("git")
         .arg("commit")
         .arg("-a")
         .arg(format!("-m{}", &commit_message))
         .output()
         .expect("Could not push changes");
 
-    let output = match String::from_utf8(git_push.stdout) {
+    let output = match String::from_utf8(git_commit.stdout) {
+        Ok(y) => y,
+        Err(e) => e.to_string(),
+    };
+
+
+    println!(
+        "\n{}",
+        output
+    );
+
+    let git_push = Command::new("git")
+        .arg("push")
+        .arg("origin")
+        .arg("master")
+        .output()
+        .expect("Could not push changes");
+
+    let push_output = match String::from_utf8(git_push.stdout) {
         Ok(y) => y,
         Err(e) => e.to_string(),
     };
     println!(
-        "\n{} Type the following commands to get started!\ncd newproject\ngit remote add origin",
-        output
+        "\n{}",
+        push_output
     );
+
     Ok(())
 }
