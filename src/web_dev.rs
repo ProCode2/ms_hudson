@@ -1,6 +1,6 @@
 use std::fs;
 use std::error::Error;
-
+use webbrowser;
 
 pub fn create_web_dev_folder(filename: &str) -> Result<(), Box<dyn Error>> {
     //create a index.html file
@@ -15,4 +15,13 @@ pub fn create_web_dev_folder(filename: &str) -> Result<(), Box<dyn Error>> {
         Err(err) => println!("{}", err)
     }
     Ok(())
+}
+
+pub fn open_stackoverflow(error: &str) -> Result<(),()> {
+    if webbrowser::open(&format!("https://stackoverflow.com/search?q={}", error)[..]).is_ok() {
+        Ok(())
+    }
+    else {
+        Err(())
+    }
 }

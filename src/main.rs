@@ -2,9 +2,9 @@ use clap::{App, Arg};
 use std::fs;
 mod git;
 mod web_dev;
-use git::{addCommitPush, make_github_repo};
+use git::{add_commit_push, make_github_repo};
 use std::io::{Error, ErrorKind};
-use web_dev::create_web_dev_folder;
+use web_dev::{create_web_dev_folder, open_stackoverflow};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -55,6 +55,13 @@ async fn main() -> std::io::Result<()> {
                 .help("The commit message")
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("Search_Stackoverflow")
+            .short("e")
+            .long("error")
+            .help("Opens and search stack overflow for given error message")
+            .takes_value(true)
+        )
         .get_matches();
 
     if matches.is_present("New_Project") {
@@ -102,7 +109,13 @@ async fn main() -> std::io::Result<()> {
         let branch = matches.value_of("git_branch").unwrap_or("master");
         let message = matches.value_of("git_commit").unwrap_or("Initial Commit");
 
-        addCommitPush(&branch, &message);
+        add_commit_push(&branch, &message);
+    }
+
+    if matches.is_present("Search_Stackoverflow") {
+        let error = matches.value_of("Search_Stackoverflow").unwrap_or("");
+
+        open_stackoverflow(&error);
     }
     Ok(())
 }

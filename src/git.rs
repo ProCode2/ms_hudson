@@ -45,7 +45,7 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn addCommitPush(branch: &str, commit_message: &str) -> Result<(), ()> {
+pub fn add_commit_push(branch: &str, commit_message: &str) -> Result<(), ()> {
     let git_commit = Command::new("git")
         .arg("commit")
         .arg("-a")
