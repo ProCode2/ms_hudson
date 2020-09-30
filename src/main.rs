@@ -109,13 +109,27 @@ async fn main() -> std::io::Result<()> {
         let branch = matches.value_of("git_branch").unwrap_or("master");
         let message = matches.value_of("git_commit").unwrap_or("Initial Commit");
 
-        add_commit_push(&branch, &message);
+        match add_commit_push(&branch, &message) { 
+            Ok(_) => {
+                println!("{}", format!("Pushed to {}", branch));
+            },
+            Err(_) => {
+                println!("Something went wrong, cannot push changes");
+            }
+        }
     }
 
     if matches.is_present("Search_Stackoverflow") {
         let error = matches.value_of("Search_Stackoverflow").unwrap_or("");
 
-        open_stackoverflow(&error);
+        match open_stackoverflow(&error) {
+            Ok(_) => {
+                println!("Opening StackOverflow");
+            },
+            Err(_) => {
+                println!("Something went wrong, cannot open StackOverflow");
+            }
+        }
     }
     Ok(())
 }

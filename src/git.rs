@@ -18,16 +18,28 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
     let mut json_map = HashMap::new();
     json_map.insert("name", filename);
 
-    let res = client.post("https://api.github.com/user/repos")
+    let res = client
+        .post("https://api.github.com/user/repos")
         .basic_auth(&username, Some(token))
         .header(USER_AGENT, &username)
         .json(&json_map)
         .send()
-        .await?
-        .text()
         .await?;
-    println!("{:?}", res);
-    
+
+    if res.status().is_success() {
+        println!(
+            "{}",
+            format!("Created Gthub repository: {}/{}", username, filename)
+        );
+    } else if res.status().is_server_error() {
+        println!("server error! can not create a github repositiory at the moment");
+    } else {
+        println!(
+            "Something went wrong, joking but Heres what did: {:?}",
+            res.status()
+        );
+    }
+
     let cd_output = Command::new("git")
         .arg("init")
         .arg(&filename)
@@ -39,8 +51,8 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
         Err(e) => e.to_string(),
     };
     println!(
-        "\n{} Type the following commands to get started!\ncd newproject\ngit remote add origin",
-        output
+        "\n{} Type the following commands to get started!\ncd {}\ngit remote add origin https://github.com/{}/{}.git",
+        output, filename, username, filename
     );
     Ok(())
 }
@@ -58,16 +70,12 @@ pub fn add_commit_push(branch: &str, commit_message: &str) -> Result<(), ()> {
         Err(e) => e.to_string(),
     };
 
-
-    println!(
-        "\n{}",
-        output
-    );
+    println!("\n{}", output);
 
     let git_push = Command::new("git")
         .arg("push")
         .arg("origin")
-        .arg("master")
+        .arg(&branch)
         .output()
         .expect("Could not push changes");
 
@@ -75,10 +83,7 @@ pub fn add_commit_push(branch: &str, commit_message: &str) -> Result<(), ()> {
         Ok(y) => y,
         Err(e) => e.to_string(),
     };
-    println!(
-        "\n{}",
-        push_output
-    );
+    println!("\n{}", push_output);
 
     Ok(())
 }
