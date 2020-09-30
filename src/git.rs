@@ -8,7 +8,7 @@ use std::process::Command;
 
 pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
     //setting dotenv variables to env variables
-    /*dotenv().expect("Failed to set env");
+    dotenv().expect("Failed to set env");
     let token = env::var("GITHUB_ACCESS_TOKEN").unwrap();
     let username = env::var("GITHUB_USERNAME").unwrap();
     println!("{}:{}", username, token);
@@ -27,7 +27,7 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
         .text()
         .await?;
     println!("{:?}", res);
-    */
+    
     let cd_output = Command::new("git")
         .arg("init")
         .arg(&filename)
