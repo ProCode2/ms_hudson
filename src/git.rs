@@ -5,13 +5,13 @@ use reqwest::Error;
 use std::collections::HashMap;
 use std::env;
 use std::process::Command;
+use colored::*;
 
 pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
     //setting dotenv variables to env variables
     dotenv().expect("Failed to set env");
     let token = env::var("GITHUB_ACCESS_TOKEN").unwrap();
     let username = env::var("GITHUB_USERNAME").unwrap();
-    println!("{}:{}", username, token);
 
     let client = Client::new();
 
@@ -29,13 +29,12 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
     if res.status().is_success() {
         println!(
             "{}",
-            format!("Created Gthub repository: {}/{}", username, filename)
+            format!("{} {}/{}","Created Gthub repository:".green(), username, filename)
         );
     } else if res.status().is_server_error() {
-        println!("server error! can not create a github repositiory at the moment");
+        println!("{}", "server error! can not create a github repositiory at the moment".red());
     } else {
-        println!(
-            "Something went wrong, joking but Heres what did: {:?}",
+        println!("{} {:?}", "Type the following commands to get started!".red(),
             res.status()
         );
     }
@@ -44,15 +43,15 @@ pub async fn make_github_repo(filename: &str) -> Result<(), Error> {
         .arg("init")
         .arg(&filename)
         .output()
-        .expect("Could not process cd command");
+        .expect(&"Could not process cd command".red());
 
     let output = match String::from_utf8(cd_output.stdout) {
         Ok(y) => y,
         Err(e) => e.to_string(),
     };
     println!(
-        "\n{} Type the following commands to get started!\ncd {}\ngit remote add origin https://github.com/{}/{}.git",
-        output, filename, username, filename
+        "{}{}\n{} {}\n{} remote add origin https://github.com/{}/{}.git",
+        output,"Type the following commands to get started!".bold().green(), "cd".yellow(), filename, "git".yellow(), username, filename
     );
     Ok(())
 }
@@ -63,14 +62,14 @@ pub fn add_commit_push(branch: &str, commit_message: &str) -> Result<(), ()> {
         .arg("-a")
         .arg(format!("-m{}", &commit_message))
         .output()
-        .expect("Could not push changes");
+        .expect(&"Could not push changes".red());
 
     let output = match String::from_utf8(git_commit.stdout) {
         Ok(y) => y,
         Err(e) => e.to_string(),
     };
 
-    println!("\n{}", output);
+    println!("{}", output.green());
 
     let git_push = Command::new("git")
         .arg("push")
@@ -83,7 +82,7 @@ pub fn add_commit_push(branch: &str, commit_message: &str) -> Result<(), ()> {
         Ok(y) => y,
         Err(e) => e.to_string(),
     };
-    println!("\n{}", push_output);
+    println!("{}", push_output.green());
 
     Ok(())
 }

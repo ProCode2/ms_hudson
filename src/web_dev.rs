@@ -1,6 +1,7 @@
 use std::fs;
 use std::error::Error;
 use webbrowser;
+use colored::*;
 
 pub fn create_web_dev_folder(filename: &str) -> Result<(), Box<dyn Error>> {
     //create a index.html file
