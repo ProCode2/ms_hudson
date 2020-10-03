@@ -25,3 +25,12 @@ pub fn open_stackoverflow(error: &str) -> Result<(),()> {
         Err(())
     }
 }
+
+pub fn open_google(input: &str) -> Result<(),()> {
+	if webbrowser::open(&format!("https://www.google.com/search?q={}", input)[..]).is_ok() {
+        Ok(())
+    }
+    else {
+        Err(())
+    }
+}

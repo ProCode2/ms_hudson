@@ -4,7 +4,7 @@ mod git;
 mod web_dev;
 use git::{add_commit_push, make_github_repo};
 use std::io::{Error, ErrorKind};
-use web_dev::{create_web_dev_folder, open_stackoverflow};
+use web_dev::{create_web_dev_folder, open_stackoverflow, open_google};
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -62,6 +62,13 @@ async fn main() -> std::io::Result<()> {
             .help("Opens and search stack overflow for given error message")
             .takes_value(true)
         )
+		.arg(
+			Arg::with_name("Search_Google")
+			.short("i")
+			.long("google")
+			.help("Opens and search google for given input")
+			.takes_value(true)
+		)
         .get_matches();
 
     if matches.is_present("New_Project") {
@@ -128,6 +135,19 @@ async fn main() -> std::io::Result<()> {
             },
             Err(_) => {
                 println!("Something went wrong, cannot open StackOverflow");
+            }
+        }
+    }
+	
+	if matches.is_present("Search_Google") {
+        let input = matches.value_of("Search_Google").unwrap_or("");
+
+        match open_google(&input) {
+            Ok(_) => {
+                println!("Opening Google Search");
+            },
+            Err(_) => {
+                println!("Something went wrong, cannot open Google");
             }
         }
     }
