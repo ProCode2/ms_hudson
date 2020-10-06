@@ -2,6 +2,7 @@ use clap::{App, Arg};
 use std::fs;
 mod git;
 mod web_dev;
+use colored::*;
 use git::{add_commit_push, make_github_repo};
 use std::io::{Error, ErrorKind};
 use web_dev::{create_web_dev_folder, open_stackoverflow, open_google};
@@ -57,10 +58,10 @@ async fn main() -> std::io::Result<()> {
         )
         .arg(
             Arg::with_name("Search_Stackoverflow")
-            .short("e")
-            .long("error")
-            .help("Opens and search stack overflow for given error message")
-            .takes_value(true)
+                .short("e")
+                .long("error")
+                .help("Opens and search stack overflow for given error message")
+                .takes_value(true),
         )
 		.arg(
 			Arg::with_name("Search_Google")
@@ -78,6 +79,7 @@ async fn main() -> std::io::Result<()> {
             //create a github repository
             match make_github_repo(&filename).await {
                 Ok(_) => {
+                    println!("{}: {}", "Created a directory".green(), filename.yellow());
                     if matches.is_present("Webdev project") {
                         //making a general web dev file structure
                         match create_web_dev_folder(&filename) {
@@ -95,13 +97,14 @@ async fn main() -> std::io::Result<()> {
                 }
             }
         } else {
-            match fs::create_dir(filename) {
+            match fs::create_dir(&filename) {
                 Ok(_) => {
+                    println!("{}: {}", "Created a directory".green(), filename.yellow());
                     if matches.is_present("Webdev project") {
                         //making a general web dev file structure
                         match create_web_dev_folder(&filename) {
-                            Ok(_) => println!("Created a web dev directory"),
-                            Err(_) => println!("Could not create a web dev directory"),
+                            Ok(_) => println!("{}", "Created a web dev directory".green()),
+                            Err(_) => println!("{}", "Could not create a web dev directory".red()),
                         }
                     }
                 }
@@ -116,12 +119,12 @@ async fn main() -> std::io::Result<()> {
         let branch = matches.value_of("git_branch").unwrap_or("master");
         let message = matches.value_of("git_commit").unwrap_or("Initial Commit");
 
-        match add_commit_push(&branch, &message) { 
+        match add_commit_push(&branch, &message) {
             Ok(_) => {
-                println!("{}", format!("Pushed to {}", branch));
-            },
+                println!("{}", format!("Pushed to {}", branch.green()));
+            }
             Err(_) => {
-                println!("Something went wrong, cannot push changes");
+                println!("{}", "Something went wrong, cannot push changes".red());
             }
         }
     }
@@ -131,10 +134,13 @@ async fn main() -> std::io::Result<()> {
 
         match open_stackoverflow(&error) {
             Ok(_) => {
-                println!("Opening StackOverflow");
-            },
+                println!("{}", "Opening StackOverflow".green());
+            }
             Err(_) => {
-                println!("Something went wrong, cannot open StackOverflow");
+                println!(
+                    "{}",
+                    "Something went wrong, cannot open StackOverflow".green()
+                );
             }
         }
     }
